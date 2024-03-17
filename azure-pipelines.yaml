@@ -39,7 +39,7 @@ stages:
       displayName: 'Terrafom init'
       inputs:
         command: init
-        backendType: azurerm
+        #backendType: azurerm
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
         # Service connection to authorize backend access. Supports Subscription & Management Group Scope
         backendServiceArm: $(azureServiceConnectionId)
@@ -47,17 +47,17 @@ stages:
         # Service connection or to override the subscription id defined in a Subscription scoped service connection
         #backendAzureRmSubscriptionId: 'my-backend-subscription-id'
         # create backend storage account if doesn't exist
-        ensureBackend: true
-        backendAzureRmResourceGroupName: 'Azuredevops'
+        #ensureBackend: true
+        #backendAzureRmResourceGroupName: 'Azuredevops'
         # azure location shortname of the backend resource group and storage account
-        backendAzureRmResourceGroupLocation: 'eastus'
-        backendAzureRmStorageAccountName: 'tfstate2241721704'
+        #backendAzureRmResourceGroupLocation: 'eastus'
+        #backendAzureRmStorageAccountName: 'tfstate2241721704'
         # azure storage account sku, used when creating the storage account
         #backendAzureRmStorageAccountSku: 'Standard_RAGRS'
         # azure blob container to store the state file
-        backendAzureRmContainerName: 'tfstate'
+        #backendAzureRmContainerName: 'tfstate'
         # azure blob file name
-        backendAzureRmKey: ''
+        #backendAzureRmKey: ''
     
 
     - task: TerraformCLI@0
@@ -199,8 +199,8 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App'
             inputs:
-              azureSubscription: ''     # ToDo
-              appName: 'lamhtMyapp2'               # ToDo
+              azureSubscription: 'Azuredevops'
+              appName: 'lamhtMyapp2'
               appType: webApp
               package: $(Pipeline.Workspace)/drop-fakerestapi-test/$(Build.BuildId)-fakerestapi.zip
           #--------------------------------------------#    
