@@ -192,7 +192,7 @@ stages:
                 wget "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.5.tgz"
                 tar -xf apache-jmeter-5.5.tgz
                 unzip -o $(Pipeline.Workspace)/drop-perftests/$(Build.BuildId)-performancetests.zip
-                ./apache-jmeter-5.5/bin/jmeter -n -t stress-test.jmx -l $(Build.BuildId)-jmeter_stress.log -e -o /home/devopsagent/$(Build.BuildId)_Stress_Test_Logs/
+                ./apache-jmeter-5.5/bin/jmeter -n -t stress-test.jmx -l $(Build.BuildId)-jmeter_stress.log -e -o $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Stress_Test_Logs/
                 cat jmeter.log
               workingDirectory: $(Pipeline.Workspace)/drop-perftests
        
@@ -204,14 +204,14 @@ stages:
                 wget "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.5.tgz"
                 tar -xf apache-jmeter-5.5.tgz
                 unzip -o $(Pipeline.Workspace)/drop-perftests/$(Build.BuildId)-performancetests.zip
-                ./apache-jmeter-5.5/bin/jmeter -n -t endurance-test.jmx -l $(Build.BuildId)-jmeter_endurance.log -e -o /home/devopsagent/$(Build.BuildId)_Endurance_Test_Logs/
+                ./apache-jmeter-5.5/bin/jmeter -n -t endurance-test.jmx -l $(Build.BuildId)-jmeter_endurance.log -e -o $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Endurance_Test_Logs/
                 cat jmeter.log
               workingDirectory: $(Pipeline.Workspace)/drop-perftests
                
           - task: ArchiveFiles@2
             displayName: Save JMeter Stress Test Report to Artifact
             inputs:
-              rootFolderOrFile: '/home/devopsagent/$(Build.BuildId)_Stress_Test_Logs/'
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)_Stress_Test_Logs/'
               includeRootFolder: false
               archiveType: 'zip'
               archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip'
@@ -220,7 +220,7 @@ stages:
           - task: ArchiveFiles@2
             displayName: Save JMeter Endurance Test Report to Artifact
             inputs:
-              rootFolderOrFile: '/home/devopsagent/$(Build.BuildId)_Endurance_Test_Logs/'
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)_Endurance_Test_Logs/'
               includeRootFolder: false
               archiveType: 'zip'
               archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip'
@@ -231,6 +231,13 @@ stages:
             inputs:
               targetPath: '$(System.DefaultWorkingDirectory)/log/jmeter'
               artifactName: 'drop-jmeter-logs'  
+          - task: CmdLine@2
+            displayName: 'Clean up'
+            inputs:
+              script: |
+                rm -rf $(System.DefaultWorkingDirectory)/log/jmeter'
+                rm -rf $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Endurance_Test_Logs'
+                rm -rf $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Stress_Test_Logs'
               
   #--------------------------------------------#  
   # Selenium | Functional UI Tests
@@ -263,18 +270,13 @@ stages:
                 if [ -f "$FILE" ]; then
                   echo "$FILE exists."
                   rm -rf $FILE
+                  rm -rf ./chromedriver-linux64
                 fi
                 wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chromedriver-linux64.zip                
-                # install chrome driver
-                ls
+                # install chrome driver                
                 unzip chromedriver-linux64.zip
-                ls
-                sudo cp chromedriver /usr/local/bin/chromedriver
-                sudo chown root:root /usr/local/bin/chromedriver
-                sudo chmod +x /usr/local/bin/chromedriver
-                sudo mv chromedriver /usr/bin/chromedriver
-                sudo chown root:root /usr/bin/chromedriver
-                sudo chmod +x /usr/bin/chromedriver
+                sudo rm /usr/local/bin/chromedriver
+                sudo ln ./chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
                 chromium-browser -version
                 chromedriver --version
                 # agent log analytics
