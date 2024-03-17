@@ -46,3 +46,15 @@ module "publicip" {
   resource_type    = "publicip"
   resource_group   = "${var.resource_group}"
 }
+
+module "virtual_machine" {
+  source               = ".//modules/vm"
+  location             = var.location
+  resource_group       = "${var.resource_group}"
+  application_type     = var.application_type
+  resource_type        = "VM"
+
+  public_ip_address_id = module.public_ip.public_ip_address_id
+  public_subnet_id     = module.network.subnet_id_test
+  admin_username       = "adminuser"
+}
