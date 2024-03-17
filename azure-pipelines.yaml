@@ -17,7 +17,7 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
   # Environment name
   environmentName: 'test'
-  azureSubscription: '44ada2e4-89f9-41cc-8efc-3cf76cd05c0c'
+  azureSubscription: 'azure'
 
 stages:
 #--------------------------------------------#  
