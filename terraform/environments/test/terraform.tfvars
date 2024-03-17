@@ -5,10 +5,10 @@ client_secret = ""
 tenant_id = "f958e84a-92b8-439f-a62d-4f45996b6d07"
 
 # Resource Group/Location
-location = "South Central US"
+location = "East US"
 resource_group_name = "Azuredevops"
 application_type = "myApplication"
-resource_group = "Azuredevops1"
+resource_group = "Azuredevops"
 
 # Network
 virtual_network_name = "my-virtual-network"
