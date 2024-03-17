@@ -8,9 +8,10 @@ trigger:
 
 # ToDo: Replace the agent pool name, if you are using Udacity Cloud lab. 
 # Otherwise, comment out the line below. 
-pool: 'Azure Pipelines'
+pool: 'myAgentPool'
 
 variables:
+  agentPoolName:'myAgentPool'
   python.version: '3.7.6'
   azureServiceConnectionId: 'azure'
   # Project root folder. Point to the folder containing manage.py file.
@@ -190,7 +191,7 @@ stages:
   # Deploy FakeRestAPI Web App
   # ToDo: Provide <environment name> you created in your DevOps project
   - deployment: FakeRestAPI
-    pool: $(Azure Pipelines)     
+    pool: $(agentPoolName)     
     environment: 'test-app'
     strategy:
       runOnce:
