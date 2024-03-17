@@ -75,13 +75,13 @@ stages:
         environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
   
     - task: TerraformTaskV1@0
-        displayName: "Terraform Apply"
-        inputs:
-          provider: "azurerm"
-          command: "apply"
-          workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
-          commandOptions: "-auto-approve"
-          environmentServiceNameAzureRM: '$(azureServiceConnectionId)'  
+      displayName: "Terraform Apply"
+      inputs:
+        provider: "azurerm"
+        command: "apply"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
+        commandOptions: "-auto-approve"
+        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'  
     #     environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
 #--------------------------------------------#    
