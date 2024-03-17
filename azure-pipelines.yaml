@@ -33,6 +33,18 @@ stages:
       displayName: 'Terrafom installation'
       inputs:
         terraformVersion: '1.2.9'
+    
+    - task: AzureCLI@2
+        displayName: "Azure Env"
+        inputs:
+          azureSubscription:  shared-test-001
+          scriptType: bash
+          addSpnToEnvironment: true
+          scriptLocation: inlineScript
+          inlineScript: |
+            export ARM_CLIENT_ID=$servicePrincipalId
+            export ARM_CLIENT_SECRET=$servicePrincipalKey
+            export ARM_TENANT_ID=$tenantId
         
     # Run Terraform Init on the pipeline agent 
     - task: TerraformCLI@0
