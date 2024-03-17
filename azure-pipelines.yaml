@@ -17,6 +17,7 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
   # Environment name
   environmentName: 'test'
+  azureSubscription: '44ada2e4-89f9-41cc-8efc-3cf76cd05c0c'
 
 stages:
 #--------------------------------------------#  
@@ -178,7 +179,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App'
             inputs:
-              azureSubscription: ''
+              azureSubscription: $(azureSubscription)
               appName: 'lamhtMyapp2'
               appType: webApp
               package: $(Pipeline.Workspace)/drop-fakerestapi-test/$(Build.BuildId)-fakerestapi.zip
@@ -237,7 +238,7 @@ stages:
   - deployment: VMDeploy
     displayName: Selenium Tests
     environment:
-      name:  Test_vm
+      name:  lamhtTestVM
       resourceType: VirtualMachine
       tags: selenium
     strategy:
