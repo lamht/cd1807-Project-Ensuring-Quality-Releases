@@ -262,9 +262,9 @@ stages:
                 FILE=chromedriver_linux64.zip
                 if [ -f "$FILE" ]; then
                   echo "$FILE exists."
-                else
-                  wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chromedriver-linux64.zip
+                  rm -rf $FILE
                 fi
+                wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chromedriver-linux64.zip                
                 # install chrome driver
                 unzip chromedriver_linux64.zip
                 sudo mv chromedriver /usr/bin/chromedriver
@@ -274,18 +274,14 @@ stages:
                 chromedriver --version
                 # agent log analytics
                 wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w dbf2bd83-6d47-436b-a499-a2b566def8fe -s MuSR8Ti5MMi0E+9+1NM4NxCxFqJcfLzuGD0EtGhjXo3Vhy/THcSdCf1WyQnkXafD+6DiFjiOAEfJiQh6EbZVeg== -d opinsights.azure.com
-
-                cd ~/
-                DIR=/home/testuser/app
-                if [ ! -d "$DIR" ]; then
-                    mkdir app
-                fi
+                pwd
+                rm -rf app
+                mkdir app
                 mv $(Pipeline.Workspace)/drop-selenium-test/$(Build.BuildId)-uitests.zip app
                 cd app
                 ls
                 unzip -o $(Build.BuildId)-uitests.zip                
                 export PATH=$PATH:/home/testuser/app
                 echo "Starting Selenium Tests"
-                python3 login.py >> selenium.log
-                rm -rf /home/testuser/app
+                python3 login.py >> selenium.log                
                 echo "Completed Selenium Tests. Check selenium.log for results."
