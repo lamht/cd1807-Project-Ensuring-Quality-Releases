@@ -12,8 +12,7 @@ pool: myAgentPool
 
 variables:
   python.version: '3.7.6'
-  # ToDo: Replace the service connection name as used in the DevOps project settings
-  azureServiceConnectionId: 'myServiceConnection'
+  azureServiceConnectionId: 'azure'
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)
   # Environment name
@@ -121,9 +120,9 @@ stages:
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/TEST-*.xml'
-        searchFolder:       # ToDo
+        searchFolder: '$(System.DefaultWorkingDirectory)'        
         mergeTestResults: true
-        testRunTitle:       # ToDo
+        testRunTitle: 'Regression test results'
 
     #--------------------------------------------#
     # Selenium (UI) Test Suite - Archive the package  
@@ -138,7 +137,7 @@ stages:
     # Selenium Test Suite - Publish the package  
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip   # Same as the archiveFile artifact above. 
       displayName: 'Upload Package'
-      artifact: drop-uitests
+      artifact: drop-selenium-test
 
     #--------------------------------------------#    
     # FakeRestAPI - Archive
@@ -146,13 +145,13 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive FakeRestAPI'
       inputs:
-        rootFolderOrFile: 
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip
       displayName: 'Upload Package'
-      artifact: drop-fakerestapi
+      artifact: drop-fakerestapi-test
 
     #--------------------------------------------#  
     # JMeter (Performance) Test Suite - Archive
@@ -160,7 +159,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive PerformanceTestSuite'
       inputs:
-        rootFolderOrFile: 
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-perftests.zip'
@@ -178,9 +177,8 @@ stages:
   # Deploy FakeRestAPI Web App
   # ToDo: Provide <environment name> you created in your DevOps project
   - deployment: FakeRestAPI
-    pool:
-      vmImage: 'Ubuntu-18.04'      
-    environment: <environment name>   # ToDo
+    pool: myAgentPool     
+    environment: 'test-app'
     strategy:
       runOnce:
         deploy:
@@ -189,20 +187,57 @@ stages:
             displayName: 'Deploy Azure Web App'
             inputs:
               azureSubscription: ''     # ToDo
-              appName: ''               # ToDo
+              appName: 'lamhtMyapp2'               # ToDo
               appType: webApp
-              package: $(Pipeline.Workspace)/<artifact>/<archiveFile>       # ToDo: Use the published zip artifact. 
+              package: $(Pipeline.Workspace)/drop-fakerestapi-test/$(Build.BuildId)-fakerestapi.zip
           #--------------------------------------------#    
-          # Run JMeter test suite against the App Service
+          # Stress Test
           - task: CmdLine@2
+            displayName: 'Stress Test'
             inputs:
               script: |
-                wget "https://apache.mirrors.lucidnetworks.net//jmeter/binaries/apache-jmeter-5.2.1.tgz"
-                tar -xf apache-jmeter-5.2.1.tgz
-                unzip -o $(Build.BuildId)-perftests.zip
-                ./apache-jmeter-5.2.1/bin/jmeter -n -t PerformanceTestSuite.jmx -j jmeter.log -f
-                cat jmeter.log                                                                           # ToDo: Write your commands
-              workingDirectory: $(Pipeline.Workspace)/<artifact>            # ToDo: Use the artifact name from the task above
+                wget "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.5.tgz"
+                tar -xf apache-jmeter-5.5.tgz
+                unzip -o $(Build.BuildId)-performancetests.zip
+                ./apache-jmeter-5.5/bin/jmeter -n -t stress-test.jmx -l $(Build.BuildId)-jmeter_stress.log -e -o /home/devopsagent/$(Build.BuildId)_Stress_Test_Logs/
+                cat jmeter.log
+              workingDirectory: $(Pipeline.Workspace)/drop-performancetests
+       
+          # Endurance Test
+          - task: CmdLine@2
+            displayName: 'Endurance Test'
+            inputs:
+              script: |
+                wget "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.5.tgz"
+                tar -xf apache-jmeter-5.5.tgz
+                unzip -o $(Build.BuildId)-performancetests.zip
+                ./apache-jmeter-5.5/bin/jmeter -n -t endurance-test.jmx -l $(Build.BuildId)-jmeter_endurance.log -e -o /home/devopsagent/$(Build.BuildId)_Endurance_Test_Logs/
+                cat jmeter.log
+              workingDirectory: $(Pipeline.Workspace)/drop-performancetests
+               
+          - task: ArchiveFiles@2
+            displayName: Save JMeter Stress Test Report to Artifact
+            inputs:
+              rootFolderOrFile: '/home/devopsagent/$(Build.BuildId)_Stress_Test_Logs/'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip'
+              verbose: true
+          
+          - task: ArchiveFiles@2
+            displayName: Save JMeter Endurance Test Report to Artifact
+            inputs:
+              rootFolderOrFile: '/home/devopsagent/$(Build.BuildId)_Endurance_Test_Logs/'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip'
+              verbose: true
+      
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish JMeter Logs'
+            inputs:
+              targetPath: '$(System.DefaultWorkingDirectory)/log/jmeter'
+              artifactName: 'drop-jmeter-logs'  
               
   #--------------------------------------------#  
   # Selenium | Functional UI Tests
@@ -210,7 +245,7 @@ stages:
   - deployment: VMDeploy
     displayName: Selenium Tests
     environment:
-      name:         # ToDo: Change/provide a name
+      name:  Test_vm
       resourceType: VirtualMachine
       tags: selenium
     strategy:
@@ -218,7 +253,7 @@ stages:
         deploy:
           steps:
           - download: current
-            artifact: drop-ui-tests     # ToDo: Change/provide a name
+            artifact: drop-selenium-test
             
           - task: Bash@3
             inputs:
@@ -236,7 +271,7 @@ stages:
                 if [ ! -d "$DIR" ]; then
                     mkdir app
                 fi
-                mv /home/testuser/azagent/_work/1/drop-uitests/$(Build.BuildId)-uitests.zip app
+                mv /home/testuser/azagent/_work/1/drop-selenium-test/$(Build.BuildId)-uitests.zip app
                 cd app
                 unzip -o $(Build.BuildId)-uitests.zip
                 FILE=/home/testuser/app/chromedriver_linux64.zip
