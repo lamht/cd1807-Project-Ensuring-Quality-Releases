@@ -35,7 +35,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          ls /home/vsts/work/_temp/
+          ls /home/devopsagent/myagent/_work/_temp/
     #--------------------------------------------#  
     # Use Terraform to create the Infrastructure      
     # Install Terraform on the pipeline agent 
