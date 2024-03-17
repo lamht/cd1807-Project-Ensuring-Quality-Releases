@@ -41,7 +41,7 @@ stages:
         command: init
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
         environmentServiceName: '$(azureServiceConnectionId)'
-        runAzLogin: true
+        #runAzLogin: true
         # Service connection to authorize backend access. Supports Subscription & Management Group Scope
         #backendServiceArm: $(azureServiceConnectionId)
         # Subscription id of the target backend. This can be used to specify the subscription when using Management Group scoped
