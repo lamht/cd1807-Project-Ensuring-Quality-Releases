@@ -1,25 +1,25 @@
 resource "azurerm_network_interface" "" {
-  name                = ""
-  location            = ""
-  resource_group_name = ""
+  name                = "vm_network1"
+  location            = "eastus"
+  resource_group_name = "Azuredevops"
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = ""
+    subnet_id                     = "vm_subnet_1"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = ""
   }
 }
 
 resource "azurerm_linux_virtual_machine" "" {
-  name                = ""
-  location            = ""
-  resource_group_name = ""
+  name                = "lamht_vm1"
+  location            = "eastus"
+  resource_group_name = "Azuredevops"
   size                = "Standard_DS2_v2"
-  admin_username      = ""
+  admin_username      = "devopsagent"
   network_interface_ids = []
   admin_ssh_key {
-    username   = ""
+    username   = "evopsagent"
     public_key = "file("~/.ssh/id_rsa.pub")"
   }
   os_disk {

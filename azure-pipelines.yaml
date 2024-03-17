@@ -29,31 +29,44 @@ stages:
     #--------------------------------------------#  
     # Use Terraform to create the Infrastructure      
     # Install Terraform on the pipeline agent 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+    - task: TerraformInstaller@1
       displayName: 'Terrafom installation'
       inputs:
         terraformVersion: '1.2.9'
-    
+        
     # Run Terraform Init on the pipeline agent 
-    # ToDo: Replace the resource group name, storage account name, and container name below
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+    - task: TerraformCLI@0
       displayName: 'Terrafom init'
       inputs:
-        provider: 'azurerm'
-        command: 'init'
+        command: init
+        backendType: azurerm
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-        backendServiceArm: '$(azureServiceConnectionId)'
-        backendAzureRmResourceGroupName: ''
-        backendAzureRmStorageAccountName: ''
-        backendAzureRmContainerName: ''
-        backendAzureRmKey: 'test.terraform.tfstate'
+        # Service connection to authorize backend access. Supports Subscription & Management Group Scope
+        backendServiceArm: $(azureServiceConnectionId)
+        # Subscription id of the target backend. This can be used to specify the subscription when using Management Group scoped
+        # Service connection or to override the subscription id defined in a Subscription scoped service connection
+        #backendAzureRmSubscriptionId: 'my-backend-subscription-id'
+        # create backend storage account if doesn't exist
+        ensureBackend: true
+        backendAzureRmResourceGroupName: 'Azuredevops'
+        # azure location shortname of the backend resource group and storage account
+        backendAzureRmResourceGroupLocation: 'eastus'
+        backendAzureRmStorageAccountName: 'tfstate2241721704'
+        # azure storage account sku, used when creating the storage account
+        #backendAzureRmStorageAccountSku: 'Standard_RAGRS'
+        # azure blob container to store the state file
+        backendAzureRmContainerName: 'tfstate'
+        # azure blob file name
+        backendAzureRmKey: ''
+    
 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
-      displayName: Terraform validate
+    - task: TerraformCLI@0
+      displayName: 'Terraform validate'
       inputs:
-        provider: 'azurerm'
-        command: 'validate'
-
+        command: validate
+        backendType: azurerm
+        
+   
     # OPTIONAL - This step is needed only if your Terraform VM uses an SSH key pair for login and you want your pipeline agent to connect to it. 
     # Generate an SSH key pair in your local/AZ Cloud shell. Use the public key in the Terraform VM module. 
     # Install public key and private key file to the pipeline agent, using the task below. 
@@ -72,11 +85,11 @@ stages:
 
     
     # Run Terraform Apply
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
-      displayName: Terraform apply
+    - task: TerraformCLI@0
+      displayName: 'Terraform apply'
       inputs:
-        provider: 'azurerm'
-        command: 'apply'
+        command: apply
+        backendType: azurerm    
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
         environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
