@@ -230,14 +230,14 @@ stages:
             displayName: 'Publish JMeter Logs'
             inputs:
               targetPath: '$(System.DefaultWorkingDirectory)/log/jmeter'
-              artifactName: 'drop-jmeter-logs'  
-          - task: CmdLine@2
-            displayName: 'Clean up'
-            inputs:
-              script: |
-                rm -rf $(System.DefaultWorkingDirectory)/log/jmeter'
-                rm -rf $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Endurance_Test_Logs'
-                rm -rf $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Stress_Test_Logs'
+              artifactName: 'drop-jmeter-logs'
+          # - task: CmdLine@2
+          #   displayName: 'Clean up'
+          #   inputs:
+          #     script: |
+          #       rm -rf $(System.DefaultWorkingDirectory)/log/jmeter'
+          #       rm -rf $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Endurance_Test_Logs'
+          #       rm -rf $(System.DefaultWorkingDirectory)/$(Build.BuildId)_Stress_Test_Logs'
               
   #--------------------------------------------#  
   # Selenium | Functional UI Tests
