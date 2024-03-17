@@ -31,8 +31,8 @@ stages:
     # Install Terraform on the pipeline agent 
     - task: TerraformInstaller@1
       displayName: 'Terrafom installation'
-      inputs:
-        terraformVersion: '1.2.9'
+      # inputs:
+      #   terraformVersion: '1.2.9'
     
     # - task: AzureCLI@2
     #   displayName: "Azure Env"
