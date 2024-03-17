@@ -237,10 +237,8 @@ stages:
   # ToDo: 
   - deployment: VMDeploy
     displayName: Selenium Tests
-    environment:
-      name:  lamhtTestVM
-      resourceType: VirtualMachine
-      tags: selenium
+    pool: myAgentPool    
+    environment: 'test-app'
     strategy:
       runOnce:
         deploy:
