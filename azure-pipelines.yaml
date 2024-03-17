@@ -26,6 +26,16 @@ stages:
   jobs:
   - job: BuildInfrastructure
     steps:
+
+    - task: InstallSSHKey@0
+      inputs:
+        knownHostsEntry: 'default'
+        sshKeySecureFile: 'id_rsa'
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: |
+          ls /home/vsts/work/_temp/
     #--------------------------------------------#  
     # Use Terraform to create the Infrastructure      
     # Install Terraform on the pipeline agent 
