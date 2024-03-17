@@ -54,7 +54,7 @@ module "virtual_machine" {
   application_type     = var.application_type
   resource_type        = "VM"
 
-  public_ip_address_id = module.public_ip.public_ip_address_id
+  public_ip_address_id = module.publicip.public_ip_address_id
   public_subnet_id     = module.network.subnet_id_test
   admin_username       = "adminuser"
 }
