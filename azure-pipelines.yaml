@@ -47,7 +47,7 @@ stages:
     #       export ARM_TENANT_ID=$tenantId
         
     # Run Terraform Init on the pipeline agent 
-    - task: TerraformTaskV1@0
+    - task: TerraformTaskV1@4
       displayName: "Terraform Init"
       inputs:
         provider: "azurerm"
@@ -57,31 +57,25 @@ stages:
         backendAzureRmResourceGroupName: "Azuredevops"
         backendAzureRmStorageAccountName: "tfstate329432302"
         backendAzureRmContainerName: "tfstate"
-        backendAzureRmKey: $env:backendAzureRmKey
+        backendAzureRmKey: 'state.tfstate'
   
-    - task: TerraformTaskV1@0
-      displayName: "Terraform Validate"
-      inputs:
-        provider: "azurerm"
-        command: "validate"
-        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
-        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
-  
-    - task: TerraformTaskV1@0
+    - task: TerraformTaskV1@4
       displayName: "Terraform Plan"
       inputs:
         provider: "azurerm"
         command: "plan"
         workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
-        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'        
+        commandOptions: '-out main.tfplan'
   
-    - task: TerraformTaskV1@0
+    - task: TerraformTaskV1@4
       displayName: "Terraform Apply"
+      condition: eq(variables['terraformPlan.changesPresent'], 'true')
       inputs:
         provider: "azurerm"
         command: "apply"
-        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
-        commandOptions: "-auto-approve"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"        
+        commandOptions: 'main.tfplan'
         environmentServiceNameAzureRM: '$(azureServiceConnectionId)'  
     #     environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
