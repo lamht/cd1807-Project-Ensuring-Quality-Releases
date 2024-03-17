@@ -48,7 +48,7 @@ module "publicip" {
 }
 
 module "virtual_machine" {
-  source               = ".//modules/vm"
+  source               = "./../modules/vm"
   location             = var.location
   resource_group       = "${var.resource_group}"
   application_type     = var.application_type
