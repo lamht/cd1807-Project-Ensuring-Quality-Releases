@@ -267,6 +267,9 @@ stages:
                 wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chromedriver-linux64.zip                
                 # install chrome driver
                 unzip chromedriver_linux64.zip
+                sudo cp chromedriver /usr/local/bin/chromedriver
+                sudo chown root:root /usr/local/bin/chromedriver
+                sudo chmod +x /usr/local/bin/chromedriver
                 sudo mv chromedriver /usr/bin/chromedriver
                 sudo chown root:root /usr/bin/chromedriver
                 sudo chmod +x /usr/bin/chromedriver
