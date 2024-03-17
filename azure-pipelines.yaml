@@ -129,7 +129,7 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip'
     # Selenium Test Suite - Publish the package  
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip   # Same as the archiveFile artifact above. 
-      displayName: 'Upload Package'
+      displayName: 'Upload Package UI Tests'
       artifact: drop-selenium-test
 
     #--------------------------------------------#    
@@ -143,7 +143,7 @@ stages:
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip
-      displayName: 'Upload Package'
+      displayName: 'Upload Package FakeRestAPI'
       artifact: drop-fakerestapi-test
 
     #--------------------------------------------#  
@@ -158,7 +158,7 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-performancetests.zip'
     # JMeter Test Suite - Publish    
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-performancetests.zip
-      displayName: 'Upload Package'
+      displayName: 'Upload Package PerformanceTestSuite'
       artifact: drop-perftests
 
 #--------------------------------------------#  
@@ -191,7 +191,7 @@ stages:
               script: |
                 wget "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.5.tgz"
                 tar -xf apache-jmeter-5.5.tgz
-                unzip -o $(Build.BuildId)-performancetests.zip
+                unzip -o $(Pipeline.Workspace)/drop-perftests/$(Build.BuildId)-performancetests.zip
                 ./apache-jmeter-5.5/bin/jmeter -n -t stress-test.jmx -l $(Build.BuildId)-jmeter_stress.log -e -o /home/devopsagent/$(Build.BuildId)_Stress_Test_Logs/
                 cat jmeter.log
               workingDirectory: $(Pipeline.Workspace)/drop-performancetests
@@ -203,7 +203,7 @@ stages:
               script: |
                 wget "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.5.tgz"
                 tar -xf apache-jmeter-5.5.tgz
-                unzip -o $(Build.BuildId)-performancetests.zip
+                unzip -o $(Pipeline.Workspace)/drop-perftests/$(Build.BuildId)-performancetests.zip
                 ./apache-jmeter-5.5/bin/jmeter -n -t endurance-test.jmx -l $(Build.BuildId)-jmeter_endurance.log -e -o /home/devopsagent/$(Build.BuildId)_Endurance_Test_Logs/
                 cat jmeter.log
               workingDirectory: $(Pipeline.Workspace)/drop-performancetests
@@ -262,8 +262,9 @@ stages:
                 if [ ! -d "$DIR" ]; then
                     mkdir app
                 fi
-                mv /home/testuser/azagent/_work/1/drop-selenium-test/$(Build.BuildId)-uitests.zip app
+                mv $(Pipeline.Workspace)/drop-selenium-test/$(Build.BuildId)-uitests.zip app
                 cd app
+                ls
                 unzip -o $(Build.BuildId)-uitests.zip
                 FILE=/home/testuser/app/chromedriver_linux64.zip
                 if [ ! -f "$FILE" ]; then
