@@ -274,7 +274,7 @@ stages:
                 chromedriver --version
                 # agent log analytics
                 wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w dbf2bd83-6d47-436b-a499-a2b566def8fe -s MuSR8Ti5MMi0E+9+1NM4NxCxFqJcfLzuGD0EtGhjXo3Vhy/THcSdCf1WyQnkXafD+6DiFjiOAEfJiQh6EbZVeg== -d opinsights.azure.com
-                
+
                 cd ~/
                 DIR=/home/testuser/app
                 if [ ! -d "$DIR" ]; then
@@ -287,4 +287,5 @@ stages:
                 export PATH=$PATH:/home/testuser/app
                 echo "Starting Selenium Tests"
                 python3 login.py >> selenium.log
+                rm -rf /home/testuser/app
                 echo "Completed Selenium Tests. Check selenium.log for results."
