@@ -37,7 +37,7 @@ stages:
     - task: AzureCLI@2
       displayName: "Azure Env"
       inputs:
-        #azureSubscription: a4b11da3-2642-4ae2-b8e0-ba40545a13d6
+        azureSubscription: azure
         scriptType: bash
         addSpnToEnvironment: true
         scriptLocation: inlineScript
@@ -47,73 +47,41 @@ stages:
           export ARM_TENANT_ID=$tenantId
         
     # Run Terraform Init on the pipeline agent 
-    - task: TerraformCLI@0
-      displayName: 'Terrafom init'
+    - task: TerraformTaskV1@0
+      displayName: "Terraform Init"
       inputs:
-        command: init
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-        environmentServiceName: '$(azureServiceConnectionId)'
-        #runAzLogin: true
-        # Service connection to authorize backend access. Supports Subscription & Management Group Scope
-        #backendServiceArm: $(azureServiceConnectionId)
-        # Subscription id of the target backend. This can be used to specify the subscription when using Management Group scoped
-        # Service connection or to override the subscription id defined in a Subscription scoped service connection
-        #backendAzureRmSubscriptionId: 'my-backend-subscription-id'
-        # create backend storage account if doesn't exist
-        #ensureBackend: true
-        #backendAzureRmResourceGroupName: 'Azuredevops'
-        # azure location shortname of the backend resource group and storage account
-        #backendAzureRmResourceGroupLocation: 'eastus'
-        #backendAzureRmStorageAccountName: 'tfstate2241721704'
-        # azure storage account sku, used when creating the storage account
-        #backendAzureRmStorageAccountSku: 'Standard_RAGRS'
-        # azure blob container to store the state file
-        #backendAzureRmContainerName: 'tfstate'
-        # azure blob file name
-        #backendAzureRmKey: ''
-    
-
-    - task: TerraformCLI@0
-      displayName: 'Terraform validate'
+        provider: "azurerm"
+        command: "init"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
+        backendServiceArm: '$(azureServiceConnectionId)'
+        backendAzureRmResourceGroupName: "Azuredevops"
+        backendAzureRmStorageAccountName: "tfstate2241721704"
+        backendAzureRmContainerName: "tfstate"
+        backendAzureRmKey: $env:backendAzureRmKey
+  
+    - task: TerraformTaskV1@0
+      displayName: "Terraform Validate"
       inputs:
-        command: validate
-        environmentServiceName: '$(azureServiceConnectionId)'
-        
-   
-    # OPTIONAL - This step is needed only if your Terraform VM uses an SSH key pair for login and you want your pipeline agent to connect to it. 
-    # Generate an SSH key pair in your local/AZ Cloud shell. Use the public key in the Terraform VM module. 
-    # Install public key and private key file to the pipeline agent, using the task below. 
-    # ToDo: Change the inputs value below
-    # - task: InstallSSHKey@0
-    #   inputs:
-    #     knownHostsEntry: 'KNOWN_HOSTS_STRING' # variable value
-    #     sshPublicKey: 'PUBLIC_KEY'            # variable value
-    #     sshKeySecureFile: 'id_rsa' # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
-    
-    # - task: DownloadSecureFile@1
-    #  name: udacity_public_key
-    #  displayName: 
-    #  inputs:
-    #   secureFile: 
-
-    
-    # Run Terraform Apply
-    - task: TerraformCLI@0
-      displayName: 'Terraform apply'
+        provider: "azurerm"
+        command: "validate"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
+  
+    - task: TerraformTaskV1@0
+      displayName: "Terraform Plan"
       inputs:
-        command: apply
-        #backendType: azurerm    
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-        environmentServiceName: '$(azureServiceConnectionId)'
-
-    # ToDo: Change the workingDirectory path, as applicable to you
-    # Destroy the resources in Azure by running a separate pipeline. 
-    # - task: TerraformTaskV3@3
-    #   displayName: Terraform destroy
-    #   inputs:
-    #     provider: 'azurerm'
-    #     command: 'destroy'
-    #     workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
+        provider: "azurerm"
+        command: "plan"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
+        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+  
+    - task: TerraformTaskV1@0
+        displayName: "Terraform Apply"
+        inputs:
+          provider: "azurerm"
+          command: "apply"
+          workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test/"
+          commandOptions: "-auto-approve"
+          environmentServiceNameAzureRM: '$(azureServiceConnectionId)'  
     #     environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
 #--------------------------------------------#    
