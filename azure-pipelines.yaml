@@ -265,6 +265,7 @@ stages:
                 sudo apt-get install unzip -y
                 sudo apt-get install -y chromium-browser
                 pip3 install selenium
+                pip install webdriver-manager
                 cd ~/
                 DIR=/home/testuser/app
                 if [ ! -d "$DIR" ]; then
@@ -273,14 +274,7 @@ stages:
                 mv $(Pipeline.Workspace)/drop-selenium-test/$(Build.BuildId)-uitests.zip app
                 cd app
                 ls
-                unzip -o $(Build.BuildId)-uitests.zip
-                FILE=/home/testuser/app/chromedriver_linux64.zip
-                if [ ! -f "$FILE" ]; then
-                    LATEST=$(wget -q -O - http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-                    wget http://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
-                    unzip -o chromedriver_linux64.zip
-                    sudo ln -s $PWD/chromedriver /usr/local/bin/chromedriver
-                fi
+                unzip -o $(Build.BuildId)-uitests.zip                
                 export PATH=$PATH:/home/testuser/app
                 echo "Starting Selenium Tests"
                 python3 login.py >> selenium.log
