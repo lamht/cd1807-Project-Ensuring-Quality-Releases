@@ -14,6 +14,10 @@ def create_driver():
     print ('Starting the browser...')
     options = ChromeOptions()
     options.add_argument("--headless") 
+    options.add_argument("--no-sandbox") 
+    options.chromeOptions.add_argument("--remote-debugging-port=9222")
+    options.add_argument("--disable-dev-shm-using") 
+    options.add_argument("--disable-gpu")
     return webdriver.Chrome(options=options)
     
 
