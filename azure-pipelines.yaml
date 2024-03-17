@@ -37,7 +37,7 @@ stages:
     - task: AzureCLI@2
       displayName: "Azure Env"
       inputs:
-        azureSubscription: a4b11da3-2642-4ae2-b8e0-ba40545a13d6
+        #azureSubscription: a4b11da3-2642-4ae2-b8e0-ba40545a13d6
         scriptType: bash
         addSpnToEnvironment: true
         scriptLocation: inlineScript
