@@ -39,8 +39,9 @@ stages:
       displayName: 'Terrafom init'
       inputs:
         command: init
-        #backendType: azurerm
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
+        environmentServiceName: '$(azureServiceConnectionId)'
+        runAzLogin: true
         # Service connection to authorize backend access. Supports Subscription & Management Group Scope
         #backendServiceArm: $(azureServiceConnectionId)
         # Subscription id of the target backend. This can be used to specify the subscription when using Management Group scoped
@@ -64,7 +65,7 @@ stages:
       displayName: 'Terraform validate'
       inputs:
         command: validate
-        backendType: azurerm
+        environmentServiceName: '$(azureServiceConnectionId)'
         
    
     # OPTIONAL - This step is needed only if your Terraform VM uses an SSH key pair for login and you want your pipeline agent to connect to it. 
@@ -89,9 +90,9 @@ stages:
       displayName: 'Terraform apply'
       inputs:
         command: apply
-        backendType: azurerm    
+        #backendType: azurerm    
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+        environmentServiceName: '$(azureServiceConnectionId)'
 
     # ToDo: Change the workingDirectory path, as applicable to you
     # Destroy the resources in Azure by running a separate pipeline. 
