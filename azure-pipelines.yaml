@@ -11,7 +11,6 @@ trigger:
 pool: 'myAgentPool'
 
 variables:
-  agentPoolName:'myAgentPool'
   python.version: '3.7.6'
   azureServiceConnectionId: 'azure'
   # Project root folder. Point to the folder containing manage.py file.
@@ -191,7 +190,7 @@ stages:
   # Deploy FakeRestAPI Web App
   # ToDo: Provide <environment name> you created in your DevOps project
   - deployment: FakeRestAPI
-    pool: $(agentPoolName)     
+    pool: myAgentPool    
     environment: 'test-app'
     strategy:
       runOnce:
