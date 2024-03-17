@@ -42,7 +42,7 @@ stages:
         #backendType: azurerm
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
         # Service connection to authorize backend access. Supports Subscription & Management Group Scope
-        backendServiceArm: $(azureServiceConnectionId)
+        #backendServiceArm: $(azureServiceConnectionId)
         # Subscription id of the target backend. This can be used to specify the subscription when using Management Group scoped
         # Service connection or to override the subscription id defined in a Subscription scoped service connection
         #backendAzureRmSubscriptionId: 'my-backend-subscription-id'
